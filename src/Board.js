@@ -27,6 +27,18 @@ export default class Board extends React.Component {
       this.swimlanes.inProgress.current,
       this.swimlanes.complete.current,
     ]);
+    this.drake.on('drop', (el, target, source, sibling) => this.handleDrop(el, target, source, sibling));
+  }
+  getLaneKey(container) {
+    return Object.keys(this.swimlanes).find(key => this.swimlanes[key].current === container);
+  }
+  handleDrop(el, target, source, sibling) {
+    console.log({
+      cardId: el.dataset.id,
+      from: this.getLaneKey(source),
+      to: this.getLaneKey(target),
+      beforeCardId: sibling ? sibling.dataset.id : null,
+    });
   }
   componentWillUnmount() {
     this.drake.destroy();
