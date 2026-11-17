@@ -7,12 +7,12 @@ import './Board.css';
 export default class Board extends React.Component {
   constructor(props) {
     super(props);
-    const clients = this.getClients();
+    const clients = this.getClients().map(client => ({ ...client, status: 'backlog' }));
     this.state = {
       clients: {
-        backlog: clients.filter(client => !client.status || client.status === 'backlog'),
-        inProgress: clients.filter(client => client.status && client.status === 'in-progress'),
-        complete: clients.filter(client => client.status && client.status === 'complete'),
+        backlog: clients,
+        inProgress: [],
+        complete: [],
       }
     }
     this.swimlanes = {
