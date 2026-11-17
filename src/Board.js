@@ -33,11 +33,30 @@ export default class Board extends React.Component {
     return Object.keys(this.swimlanes).find(key => this.swimlanes[key].current === container);
   }
   handleDrop(el, target, source, sibling) {
-    console.log({
-      cardId: el.dataset.id,
-      from: this.getLaneKey(source),
-      to: this.getLaneKey(target),
-      beforeCardId: sibling ? sibling.dataset.id : null,
+    this.drake.cancel(true);
+
+    const cardId = el.dataset.id;
+    const fromLane = this.getLaneKey(source);
+    const toLane = this.getLaneKey(target);
+    const siblingId = sibling ? sibling.dataset.id : null;
+    const laneStatus = { backlog: 'backlog', inProgress: 'in-progress', complete: 'complete' };
+
+    this.setState(prevState => {
+      const clients = { ...prevState.clients };
+      const card = clients[fromLane].find(client => client.id === cardId);
+      clients[fromLane] = clients[fromLane].filter(client => client.id !== cardId);
+
+      const updatedCard = { ...card, status: laneStatus[toLane] };
+      const targetList = [...clients[toLane]];
+      const siblingIndex = targetList.findIndex(client => client.id === siblingId);
+      if (siblingIndex === -1) {
+        targetList.push(updatedCard);
+      } else {
+        targetList.splice(siblingIndex, 0, updatedCard);
+      }
+      clients[toLane] = targetList;
+
+      return { clients };
     });
   }
   componentWillUnmount() {
